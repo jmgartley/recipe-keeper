@@ -38,7 +38,7 @@ def add():
 
     for qty, unit, ingr in zip(quantities, units, ingredients):
         if ingr.strip():
-            ingredient_id = get_or_create_ingredient(conn, ingr.strip())
+            ingredient_id = get_or_create(conn, "ingredients", ingr.strip())
             conn.execute(
                 "INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit) VALUES (?, ?, ?, ?)",
                 (recipe_id, ingredient_id, qty or None, unit or None)
@@ -48,7 +48,7 @@ def add():
 
     for tool in tools:
         if tool.strip():
-            tool_id = get_or_create_tools(conn, tool.strip())
+            tool_id = get_or_create(conn, "tools", tool.strip())
             conn.execute(
                 "INSERT INTO recipe_tools (recipe_id, tool_id) VALUES (?, ?)",
                 (recipe_id, tool_id)
@@ -58,7 +58,7 @@ def add():
     
     for tag in tags:
         if tag.strip():
-            tag_id = get_or_create_tags(conn, tag.strip())
+            tag_id = get_or_create(conn, "tags", tag.strip())
             conn.execute(
                 "INSERT INTO recipe_tags (recipe_id, tag_id) VALUES (?, ?)",
                 (recipe_id, tag_id)
@@ -68,27 +68,34 @@ def add():
     conn.close()
     return redirect("/")
 
-def get_or_create_ingredient(conn, name):
-    #if ingredient already in ingredient table, use that
-    #else, make ingredient row in ingredient table and now use that
-    row = conn.execute("SELECT id FROM ingredients WHERE name = ?", (name,)).fetchone()
-    if row:
-        return row["id"]
-    cursor = conn.execute("INSERT INTO ingredients (name) VALUES (?)", (name,))
-    return cursor.lastrowid
+# def get_or_create_ingredient(conn, name):
+#     #if ingredient already in ingredient table, use that
+#     #else, make ingredient row in ingredient table and now use that
+#     row = conn.execute("SELECT id FROM ingredients WHERE name = ?", (name,)).fetchone()
+#     if row:
+#         return row["id"]
+#     cursor = conn.execute("INSERT INTO ingredients (name) VALUES (?)", (name,))
+#     return cursor.lastrowid
 
-def get_or_create_tools(conn, name):
-    row = conn.execute("SELECT id FROM tools WHERE name = ?", (name,)).fetchone()
-    if row:
-        return row["id"]
-    cursor = conn.execute("INSERT INTO tools (name) VALUES (?)", (name,))
-    return cursor.lastrowid
+# def get_or_create_tools(conn, name):
+#     row = conn.execute("SELECT id FROM tools WHERE name = ?", (name,)).fetchone()
+#     if row:
+#         return row["id"]
+#     cursor = conn.execute("INSERT INTO tools (name) VALUES (?)", (name,))
+#     return cursor.lastrowid
 
-def get_or_create_tags(conn, name):
-    row = conn.execute("SELECT id FROM tags WHERE name = ?", (name,)).fetchone()
+# def get_or_create_tags(conn, name):
+#     row = conn.execute("SELECT id FROM tags WHERE name = ?", (name,)).fetchone()
+#     if row:
+#         return row["id"]
+#     cursor = conn.execute("INSERT INTO tags (name) VALUES (?)", (name,))
+#     return cursor.lastrowid
+
+def get_or_create(conn, table, name):
+    row = conn.execute(f"SELECT id FROM {table} WHERE name = ?", (name,)).fetchone()
     if row:
         return row["id"]
-    cursor = conn.execute("INSERT INTO tags (name) VALUES (?)", (name,))
+    cursor = conn.execute(f"INSERT INTO {table} (name) VALUES (?)", (name,))
     return cursor.lastrowid
 
 if __name__ == "__main__":
