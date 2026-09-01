@@ -26,7 +26,12 @@
                     <input type="text" name="tool_name" placeholder="Equipment">
                 </div>
             {% endfor %}
-
+            <h3>Tags</h3>
+            {% for i in range(5) %}
+                <div>
+                    <input type="text" name="tag_name" placeholder="Tag">
+                </div>
+            {% endfor %}
             <input type="number" name="rating" placeholder="Rating (1-5)" step="0.5" min="1" max="5">
             <input type="text" name="source" placeholder="Source">
             

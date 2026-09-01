@@ -54,6 +54,16 @@ def add():
                 (recipe_id, tool_id)
             )
 
+    tags = request.form.getlist("tag_name")
+    
+    for tag in tags:
+        if tag.strip():
+            tag_id = get_or_create_tags(conn, tag.strip())
+            conn.execute(
+                "INSERT INTO recipe_tags (recipe_id, tag_id) VALUES (?, ?)",
+                (recipe_id, tag_id)
+            )
+
     conn.commit()
     conn.close()
     return redirect("/")
@@ -72,6 +82,13 @@ def get_or_create_tools(conn, name):
     if row:
         return row["id"]
     cursor = conn.execute("INSERT INTO tools (name) VALUES (?)", (name,))
+    return cursor.lastrowid
+
+def get_or_create_tags(conn, name):
+    row = conn.execute("SELECT id FROM tags WHERE name = ?", (name,)).fetchone()
+    if row:
+        return row["id"]
+    cursor = conn.execute("INSERT INTO tags (name) VALUES (?)", (name,))
     return cursor.lastrowid
 
 if __name__ == "__main__":
