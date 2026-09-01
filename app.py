@@ -44,6 +44,16 @@ def add():
                 (recipe_id, ingredient_id, qty or None, unit or None)
             )
 
+    tools = request.form.getlist("tool_name")
+
+    for tool in tools:
+        if tool.strip():
+            tool_id = get_or_create_tools(conn, tool.strip())
+            conn.execute(
+                "INSERT INTO recipe_tools (recipe_id, tool_id) VALUES (?, ?)",
+                (recipe_id, tool_id)
+            )
+
     conn.commit()
     conn.close()
     return redirect("/")
@@ -55,6 +65,13 @@ def get_or_create_ingredient(conn, name):
     if row:
         return row["id"]
     cursor = conn.execute("INSERT INTO ingredients (name) VALUES (?)", (name,))
+    return cursor.lastrowid
+
+def get_or_create_tools(conn, name):
+    row = conn.execute("SELECT id FROM tools WHERE name = ?", (name,)).fetchone()
+    if row:
+        return row["id"]
+    cursor = conn.execute("INSERT INTO tools (name) VALUES (?)", (name,))
     return cursor.lastrowid
 
 if __name__ == "__main__":
