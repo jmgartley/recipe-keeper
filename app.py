@@ -19,7 +19,7 @@ def index():
 @app.route("/add", methods=["POST"])
 def add():
     conn = get_db()
-    conn.execute(
+    cursor = conn.execute(
         "INSERT INTO recipes (title, prep_time, cook_time,instructions, rating, source) VALUES (?, ?, ?, ?, ?, ?)",
         (
             request.form["title"],
@@ -30,9 +30,32 @@ def add():
             request.form.get("instructions") or None
         )
     )
+    recipe_id = cursor.lastrowid
+
+    quantities = request.form.getlist("ingredient_quantity")
+    units = request.form.getlist("ingredient_unit")
+    ingredients = request.form.getlist("ingredient_name")
+
+    for qty, unit, ingr in zip(quantities, units, ingredients):
+        if ingr.strip():
+            ingredient_id = get_or_create_ingredient(conn, ingr.strip())
+            conn.execute(
+                "INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit) VALUES (?, ?, ?, ?)",
+                (recipe_id, ingredient_id, qty or None, unit or None)
+            )
+
     conn.commit()
     conn.close()
     return redirect("/")
+
+def get_or_create_ingredient(conn, name):
+    #if ingredient already in ingredient table, use that
+    #else, make ingredient row in ingredient table and now use that
+    row = conn.execute("SELECT id FROM ingredients WHERE name = ?", (name,)).fetchone()
+    if row:
+        return row["id"]
+    cursor = conn.execute("INSERT INTO ingredients (name) VALUES (?)", (name,))
+    return cursor.lastrowid
 
 if __name__ == "__main__":
     app.run(debug=True)
