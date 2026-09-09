@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <header> {{ recipe.title }}</header>
+    <body>
+        <a href="/">&larr; Back to All Recipes</a>
+        <h1>{{ recipe.title }}</h1>
+        <p>Prep Time: {{ recipe.prep_time}} min
+            <br>
+            Cook Time: {{recipe.cook_time}}
+            <br>
+            Rating: {{ recipe.rating }} <!-- make visual? ie show stars/fractions of stars -->
+        </p>
+        <p>Source: {{ recipe.source }}</p>
+
+        <h3>Tags</h3>
+        <ul>
+            {% for tag in tags %}
+                <li> {{ tag.name }}</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Ingredients</h3>
+        <!-- 5 Cups Water-->
+        <ul>
+            {% for ing in ingredients %}
+                <li>{{ ing.quantity }} {{ ing.unit }} {{ ing.name }} </li>
+            {% endfor %}
+        </ul>
+
+        <h3>Tools</h3>
+        <ul>
+            {% for tool in tools %}
+                <li> {{ tool.name }}</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Instructions</h3>
+        <p>{{ recipe.instructions }}</p>
+
+
+
+    </body>
+</html>

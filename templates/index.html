@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <header>
         <title>Recipe Tracker</title>
     </header>
@@ -40,7 +40,7 @@
 
         <ul>
             {% for recipe in recipes %}
-                <li>{{ recipe.title }} - prep: {{ recipe.prep_time }} min, cook: {{ recipe.cook_time }} min, rating: {{ recipe.rating }}</li>
+                <li><a href="/recipe/{{ recipe.id }}">{{ recipe.title }}</a> - prep: {{ recipe.prep_time }} min, cook: {{ recipe.cook_time }} min, rating: {{ recipe.rating }}</li>
             {% endfor %}
         </ul>
     </body>

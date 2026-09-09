@@ -16,11 +16,40 @@ def index():
     conn.close()
     return render_template("index.html", recipes=recipes)
 
+@app.route("/recipe/<int:recipe_id>")
+def recipe_detail(recipe_id):
+    conn = get_db()
+    recipe = conn.execute("SELECT * FROM recipes WHERE id = ?", (recipe_id,)).fetchone()
+
+    ingredients = conn.execute("""
+    SELECT ingredients.name, recipe_ingredients.quantity, recipe_ingredients.unit
+    FROM recipe_ingredients
+    JOIN ingredients ON recipe_ingredients.ingredient_id = ingredients.id
+    WHERE recipe_ingredients.recipe_id = ?
+    """, (recipe_id,)).fetchall()
+
+    tools = conn.execute("""
+    SELECT tools.name
+    FROM recipe_tools
+    JOIN tools ON recipe_tools.tool_id = tools.id
+    WHERE  recipe_tools.recipe_id = ?
+    """, (recipe_id,)).fetchall()
+
+    tags = conn.execute("""
+    SELECT tags.name
+    FROM recipe_tags
+    JOIN tags ON recipe_tags.tag_id = tags.id
+    WHERE recipe_tags.recipe_id = ?
+    """, (recipe_id,)).fetchall()
+
+    conn.close()
+    return render_template("recipe_detail.html", recipe=recipe, ingredients=ingredients, tools=tools, tags=tags)
+
 @app.route("/add", methods=["POST"])
 def add():
     conn = get_db()
     cursor = conn.execute(
-        "INSERT INTO recipes (title, prep_time, cook_time,instructions, rating, source) VALUES (?, ?, ?, ?, ?, ?)",
+        "INSERT INTO recipes (title, prep_time, cook_time, rating, source, instructions) VALUES (?, ?, ?, ?, ?, ?)",
         (
             request.form["title"],
             request.form.get("prep_time") or None,
@@ -68,28 +97,6 @@ def add():
     conn.close()
     return redirect("/")
 
-# def get_or_create_ingredient(conn, name):
-#     #if ingredient already in ingredient table, use that
-#     #else, make ingredient row in ingredient table and now use that
-#     row = conn.execute("SELECT id FROM ingredients WHERE name = ?", (name,)).fetchone()
-#     if row:
-#         return row["id"]
-#     cursor = conn.execute("INSERT INTO ingredients (name) VALUES (?)", (name,))
-#     return cursor.lastrowid
-
-# def get_or_create_tools(conn, name):
-#     row = conn.execute("SELECT id FROM tools WHERE name = ?", (name,)).fetchone()
-#     if row:
-#         return row["id"]
-#     cursor = conn.execute("INSERT INTO tools (name) VALUES (?)", (name,))
-#     return cursor.lastrowid
-
-# def get_or_create_tags(conn, name):
-#     row = conn.execute("SELECT id FROM tags WHERE name = ?", (name,)).fetchone()
-#     if row:
-#         return row["id"]
-#     cursor = conn.execute("INSERT INTO tags (name) VALUES (?)", (name,))
-#     return cursor.lastrowid
 
 def get_or_create(conn, table, name):
     row = conn.execute(f"SELECT id FROM {table} WHERE name = ?", (name,)).fetchone()
