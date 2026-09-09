@@ -42,8 +42,27 @@ def recipe_detail(recipe_id):
     WHERE recipe_tags.recipe_id = ?
     """, (recipe_id,)).fetchall()
 
+    cook_log = conn.execute("""
+    SELECT *
+    FROM cook_log
+    WHERE recipe_id = ?
+    ORDER BY date_made DESC
+    """, (recipe_id,)).fetchall()
+
     conn.close()
-    return render_template("recipe_detail.html", recipe=recipe, ingredients=ingredients, tools=tools, tags=tags)
+    return render_template("recipe_detail.html", recipe=recipe, ingredients=ingredients, tools=tools, tags=tags, cook_log=cook_log)
+
+@app.route("/recipe/<int:recipe_id>/log", methods=["POST"])
+def add_cook_log(recipe_id):
+    conn = get_db()
+    conn.execute(
+        "INSERT INTO cook_log (recipe_id, date_made, notes) VALUES (?, ?, ?)", 
+        (recipe_id, request.form.get("date_made") or None, request.form.get("notes") or None)
+    )
+
+    conn.commit()
+    conn.close()
+    return redirect(f"/recipe/{recipe_id}")
 
 @app.route("/add", methods=["POST"])
 def add():

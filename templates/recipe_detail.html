@@ -37,7 +37,19 @@
         <h3>Instructions</h3>
         <p>{{ recipe.instructions }}</p>
 
+        <hr>
+        <h3>Cook Log</h3>
+        <form action="/recipe/{{ recipe.id }}/log" method="POST">
+            <input type="date" name="date_made">
+            <textarea name="notes" placeholder="Notes about this cooking session..." rows="2"></textarea>
+            <button type="submit">Add Log Entry</button>
+        </form>
 
+        <ul>
+            {% for log in cook_log %}
+            <li>{{ log.date_made }} - {{ log.notes }}</li>
+            {% endfor %}
+        </ul>
 
     </body>
 </html>
