@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-    <header> {{ recipe.title }}</header>
+    <header> 
+        <title>{{ recipe.title }}</title>
+        <style>
+            @media print {
+                a, button, .no-print {
+                    display: none;
+                }
+                body {
+                    font-family: serif;
+                }
+            }
+
+        </style>
+    </header>
     <body>
         <a href="/">&larr; Back to All Recipes</a>
         <h1>{{ recipe.title }}</h1>
@@ -12,13 +25,14 @@
         </p>
         <p>Source: {{ recipe.source }}</p>
 
-        <h3>Tags</h3>
-        <ul>
-            {% for tag in tags %}
-                <li> {{ tag.name }}</li>
-            {% endfor %}
-        </ul>
-
+        <div class="no-print">
+            <h3>Tags</h3>
+            <ul>
+                {% for tag in tags %}
+                    <li> {{ tag.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
         <h3>Ingredients</h3>
         <!-- 5 Cups Water-->
         <ul>
@@ -37,19 +51,23 @@
         <h3>Instructions</h3>
         <p>{{ recipe.instructions }}</p>
 
-        <hr>
-        <h3>Cook Log</h3>
-        <form action="/recipe/{{ recipe.id }}/log" method="POST">
-            <input type="date" name="date_made">
-            <textarea name="notes" placeholder="Notes about this cooking session..." rows="2"></textarea>
-            <button type="submit">Add Log Entry</button>
-        </form>
+        
+        <button onclick="window.print()">Print Recipe</button>
+        <div class="no-print">
+            <hr>
+            <h3>Cook Log</h3>
+            <form action="/recipe/{{ recipe.id }}/log" method="POST">
+                <input type="date" name="date_made">
+                <textarea name="notes" placeholder="Notes about this cooking session..." rows="2"></textarea>
+                <button type="submit">Add Log Entry</button>
+            </form>
 
-        <ul>
-            {% for log in cook_log %}
-            <li>{{ log.date_made }} - {{ log.notes }}</li>
-            {% endfor %}
-        </ul>
+            <ul>
+                {% for log in cook_log %}
+                <li>{{ log.date_made }} - {{ log.notes }}</li>
+                {% endfor %}
+            </ul>
+        </div>
 
     </body>
 </html>
