@@ -16,6 +16,21 @@ def index():
     conn.close()
     return render_template("index.html", recipes=recipes)
 
+@app.route("/grocery_list")
+def grocery_list():
+    recipe_ids = request.args.getlist("recipe_ids")
+    conn = get_db()
+
+    placeholders = ','.join('?' for _ in recipe_ids)
+    rows = conn.execute(f"""
+        SELECT ingredients.name, recipe_ingredients.quantity, recipe_ingredients.unit
+        FROM recipe_ingredients
+        JOIN ingredients ON recipe_ingredients.ingredient_id = ingredients.id
+        WHERE recipe_ingredients.recipe_id IN ({placeholders})
+    """, recipe_ids).fetchall()
+    conn.close()
+    return str([dict(row) for row in rows])  # placeholder for testing
+
 @app.route("/recipe/<int:recipe_id>")
 def recipe_detail(recipe_id):
     conn = get_db()
@@ -81,7 +96,14 @@ def add():
     recipe_id = cursor.lastrowid
 
     quantities = request.form.getlist("ingredient_quantity")
-    units = request.form.getlist("ingredient_unit")
+    # units = request.form.getlist("ingredient_unit")
+    units_dropdown = request.form.getlist("ingredient_unit")
+    units_other = request.form.getlist("ingredient_unit_other")
+    units = [
+        other.strip().lower() if dropdown == "other" and other.strip() else dropdown
+        for dropdown, other in zip(units_dropdown, units_other)
+    ]
+
     ingredients = request.form.getlist("ingredient_name")
 
     for qty, unit, ingr in zip(quantities, units, ingredients):

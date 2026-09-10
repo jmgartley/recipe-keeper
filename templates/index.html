@@ -16,7 +16,22 @@
             {% for i in range(5) %}
                 <div>
                     <input type="number" name="ingredient_quantity" placeholder="Qty" step=".25">
-                    <input type="text" name="ingredient_unit" placeholder="Units">
+                    <!--<input type="text" name="ingredient_unit" placeholder="Units"> -->
+                    <select name="ingredient_unit" onchange="toggleOtherUnit(this)">
+                        <option value=""></option>
+                        <option value="tsp">tsp</option>
+                        <option value="tbsp">tbsp</option>
+                        <option value="cup">cup</option>
+                        <option value="oz">oz</option>
+                        <option value="lb">lb</option>
+                        <option value="g">g</option>
+                        <option value="kg">kg</option>
+                        <option value="ml">ml</option>
+                        <option value="l">l</option>
+                        <option value="whole">whole</option>
+                        <option value="other">Other...</option>
+                    </select>
+                    <input type="text" name="ingredient_unit_other" placeholder="Specify unit" style="display: none;">
                     <input type="text" name="ingredient_name" placeholder="Ingredient">
                 </div>
             {% endfor %}
@@ -38,10 +53,23 @@
             <button type="submit">Add recipe</button>
         </form>
 
-        <ul>
-            {% for recipe in recipes %}
-                <li><a href="/recipe/{{ recipe.id }}">{{ recipe.title }}</a> - prep: {{ recipe.prep_time }} min, cook: {{ recipe.cook_time }} min, rating: {{ recipe.rating }}</li>
-            {% endfor %}
-        </ul>
+        <form action="/grocery_list" method="GET">
+            <ul>
+                {% for recipe in recipes %}
+                    <li>
+                        <input type="checkbox" name="recipe_ids" value="{{ recipe.id }}">
+                        <a href="/recipe/{{ recipe.id }}">{{ recipe.title }}</a> - prep: {{ recipe.prep_time }} min, cook: {{ recipe.cook_time }} min, rating: {{ recipe.rating }}
+                    </li>
+                {% endfor %}
+            </ul>
+            <button type="submit">Generate Grocery List</button>
+        </form>
+    
+        <script>
+            function toggleOtherUnit(select) {
+                const otherInput = select.nextElementSibling;
+                otherInput.style.display = select.value === "other" ? "inline" : "none";
+            }
+        </script>
     </body>
 </html>
