@@ -16,8 +16,8 @@ def index():
     conn.close()
     return render_template("index.html", recipes=recipes)
 
-@app.route("/grocery_list")
-def grocery_list():
+@app.route("/grocery_list_view")
+def grocery_list_view():
     recipe_ids = request.args.getlist("recipe_ids")
     conn = get_db()
 
@@ -29,7 +29,20 @@ def grocery_list():
         WHERE recipe_ingredients.recipe_id IN ({placeholders})
     """, recipe_ids).fetchall()
     conn.close()
-    return str([dict(row) for row in rows])  # placeholder for testing
+
+    from collections import defaultdict
+
+    grocery_items = defaultdict(float)
+    for row in rows:
+        key = (row["name"], row["unit"])
+        grocery_items[key] += row["quantity"] or 0
+
+    grocery_list = [
+        {"name": name, "unit": unit, "quantity": qty}
+        for (name, unit), qty in grocery_items.items()
+    ]
+
+    return render_template("grocery_list.html", grocery_list=grocery_list)
 
 @app.route("/recipe/<int:recipe_id>")
 def recipe_detail(recipe_id):

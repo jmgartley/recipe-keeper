@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <header> 
+        <title>Grocery List</title>
+        <style>
+            @media print {
+                a, button, .no-print {
+                    display: none;
+                }
+                body {
+                    font-family: serif;
+                }
+            }
+        </style>
+    </header>
+    <body>
+        <a href="/" class="no-print">&larr; Back to All Recipes</a>
+        <h1>Grocery List</h1>
+        <ul>
+            {% for item in grocery_list %}
+                <li> {{ item.quantity }} {{ item.unit }} {{ item.name }}</li>
+            {% endfor %}
+        </ul>
+        <button onclick="window.print()" class="no-print">Print Grocery List</button>
+    </body>
+</html>
