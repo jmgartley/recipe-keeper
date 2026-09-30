@@ -34,11 +34,11 @@ def grocery_list_view():
 
     grocery_items = defaultdict(float)
     for row in rows:
-        key = (row["name"], row["unit"])
+        key = (row["name"].strip().lower(), row["unit"])
         grocery_items[key] += row["quantity"] or 0
 
     grocery_list = [
-        {"name": name, "unit": unit, "quantity": qty}
+        {"name": name.title(), "unit": unit, "quantity": qty}
         for (name, unit), qty in grocery_items.items()
     ]
 
